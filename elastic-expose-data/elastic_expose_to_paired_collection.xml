@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tool id="elastic_expose_list_paired_collection" name="elastic_expose_list_paired_collection" version="1.0.0">
+  <macros>
+    <import>elastic_tool_wrappers_macros.xml</import>
+  </macros>
+  <description/>
+  <requirements>
+    <expand macro="rmarkdown_requirements"/>
+  </requirements>
+  <expand macro="stdio"/>
+  <expand macro="shell_command"/>
+  <inputs>
+    <expand macro="option_argument_path_relative_to_a_tool"/>
+  </inputs>
+  <outputs>
+    <data format="html" name="report" label="${tool.name} report"/>
+    <data format="txt" name="tool_log" label="${tool.name} log"/>
+    <collection type="paired" name="list_collection">
+      <discover_datasets pattern="__name_and_ext__" directory="paired_dir" />
+    </collection>
+  </outputs>
+  <citations>
+    <expand macro="citations"/>
+  </citations>
+</tool>
