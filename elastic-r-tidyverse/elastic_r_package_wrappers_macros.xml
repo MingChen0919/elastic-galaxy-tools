@@ -1,0 +1,227 @@
+<macros>
+
+    <xml name="rmarkdown_requirements">
+        <requirement type="package" version="1.15.0.6-0">pandoc</requirement>
+        <requirement type="package" version="1.6">r-rmarkdown</requirement>
+        <requirement type="package" version="1.2.1">r-tidyverse</requirement>
+    </xml>
+
+    <xml name="stdio">
+        <stdio>
+            <regex match="XXX" source="stderr" level="warning"
+                   description="Check the tool log output file for more details."/>
+        </stdio>
+    </xml>
+
+    <xml name="function_components">
+        <repeat name="function_component_repeat" title="Call a function" min="1" default="1">
+            <expand macro="function_name" />
+            <expand macro="function_arguments" />
+        </repeat>
+    </xml>
+
+    <!--Tool name-->
+    <xml name="function_name">
+        <param type="select" name="function_name" multiple="false" label="==== Call function ====">
+            <option value="ggplot" selected="false">ggplot</option>
+            <option value="aes" selected="false">ggplot</option>
+            <option value="read.table" selected="false">read.table</option>
+            <option value="write.csv" selected="false">write.csv</option>
+        </param>
+    </xml>
+
+    <!--input values: string, float and integer-->
+    <xml name="function_arguments">
+        <repeat name="regular_argument_value" title="--------Argument value: from user input" min="0" default="0">
+            <param type="text" name="argument" label="argument"  />
+            <param type="text" name="argument_value"  label="argument value"  />
+            <param type="select" name="argument_type"  label="argument type">
+                <option value="string" selected="true">string</option>
+                <option value="numeric" selected="true">numeric</option>
+                <option value="boolean" selected="true">boolean</option>
+            </param>
+        </repeat>
+        <repeat name="rdata_argument_value" title="--------Argument value: from RData" min="0" default="0">
+            <param type="text" name="argument" label="argument"  />
+            <param type="data" format="rdata" name="argument_value" optional="false" label="RData output"  />
+        </repeat>
+        <repeat name="function_argument_value" title="--------Argument value: from function return" min="0" default="0">
+            <param type="text" name="argument" optional="false" label="argument"  />
+            <expand macro="function_name" />
+            <expand macro="nested_function_arguments" />
+        </repeat>
+        <param type="select" name="connect_to_next_function" label="connect to next function">
+            <option value="%>%" selected="false">pipe (%>%)</option>
+            <option value="+" selected="false">plus (+)</option>
+        </param>
+    </xml>
+
+    <xml name="nested_function_arguments">
+        <repeat name="regular_argument_value" title="--------Argument value: from user input" min="0" default="0">
+            <param type="text" name="argument" label="argument"  />
+            <param type="text" name="argument_value"  label="argument value"  />
+            <param type="select" name="argument_type"  label="argument type">
+                <option value="string" selected="true">string</option>
+                <option value="numeric" selected="true">numeric</option>
+                <option value="boolean" selected="true">boolean</option>
+            </param>
+        </repeat>
+        <repeat name="rdata_argument_value" title="--------Argument value: from RData" min="0" default="0">
+            <param type="text" name="argument" label="argument"  />
+            <param type="text" name="argument_value"  label="RData output"  />
+        </repeat>
+    </xml>
+
+    <!--&lt;!&ndash;OPTION/ARGUMENT PAIRS and INPUT types&ndash;&gt;-->
+    <!--&lt;!&ndash;input files&ndash;&gt;-->
+    <!--<xml name="option_argument_single_dataset">-->
+        <!--<repeat name="option_argument_single_dataset_repeat" title="INPUT DATA FROM HISTORY: single data set" min="0" default="0">-->
+            <!--<param type="text" name="flag" optional="true" label="flag" />-->
+            <!--<param name="value" type="data" optional="false" multiple="false" label="value"/>-->
+        <!--</repeat>-->
+    <!--</xml>-->
+
+    <!--<xml name="option_argument_multiple_datasets">-->
+        <!--<repeat name="option_argument_multiple_datasets_repeat" title="INPUT DATA FROM HISTORY: multiple data sets" min="0" default="0">-->
+            <!--<param type="text" name="flag" optional="true" label="flag" />-->
+            <!--<param name="value" type="data" optional="false" multiple="true" label="value"/>-->
+            <!--<param type="select" name="delimiter" multiple="false" label="file delimiter">-->
+                <!--<option value=" " selected="false">space</option>-->
+                <!--<option value="," selected="false">comma</option>-->
+            <!--</param>-->
+        <!--</repeat>-->
+    <!--</xml>-->
+
+    <!--&lt;!&ndash;input path&ndash;&gt;-->
+    <!--<xml name="option_argument_path_relative_to_a_tool">-->
+        <!--<repeat name="option_argument_path_relative_to_a_tool_repeat" title="INPUT DATA PATH: relative to a tool output directory" min="0" default="0">-->
+            <!--<param type="text" name="flag" optional="true" label="flag"  />-->
+            <!--<param name="a_tool_output_dir" type="data" optional="false" multiple="false" label="a tool output directory"/>-->
+            <!--<param type="text" name="value" optional="true" label="value"  />-->
+        <!--</repeat>-->
+    <!--</xml>-->
+    <!--<xml name="option_argument_path_relative_to_this_tool">-->
+        <!--<repeat name="option_argument_path_relative_to_this_tool_repeat" title="OUTPUT PATH: relative to this tool output directory" min="0" default="0">-->
+            <!--<param type="text" name="flag" optional="true" label="flag"  />-->
+            <!--<param type="text" name="value" optional="false" label="value"  />-->
+            <!--<param type="select" name="path_type" multiple="false" label="path type">-->
+                <!--<option value="file_path" selected="false">file path</option>-->
+                <!--<option value="dir_path" selected="false">directory path</option>-->
+            <!--</param>-->
+        <!--</repeat>-->
+    <!--</xml>-->
+
+
+
+    <!--output set-->
+    <xml name="output_set">
+        <data format="html" name="report" label="${tool.name} report"/>
+        <data format="txt" name="tool_help_doc" label="${tool.name} help doc"/>
+        <data format="txt" name="tool_output_dir" label="${tool.name} output directory"/>
+        <data format="txt" name="tool_log" label="${tool.name} log" />
+    </xml>
+
+
+    <!--shell command fragment-->
+    <xml name="shell_command">
+        <command><![CDATA[
+
+        ############ first, create a directory to store all files
+        mkdir -p $report.files_path &&
+
+
+        ############ save the tool installation directory to an environment variable
+        export TOOL_INSTALL_DIR='${__tool_directory__}' &&
+
+
+        #########################
+        ##
+        ## save user input option/argument pairs into a file
+        ##
+        #########################
+
+        ## first line will be the header
+        echo 'type|flag|value|path_type' > $report.files_path/options_and_arguments.txt &&
+
+        ############ function_name
+        ##-t '$function_name'
+        echo "function_name|not available|${function_name}|not available" >> $report.files_path/options_and_arguments.txt &&
+
+        ####################################################
+        ## loop through repeats to get option/argument pairs
+        ####################################################
+
+        ############ option_argument_single_dataset
+        #for i in $option_argument_single_dataset_repeat:
+            #set $item = 'single_dataset|' + str($i.flag) + "|" + str($i.value) + "|"
+            echo '$item' >> $report.files_path/options_and_arguments.txt &&
+        #end for
+
+        ############ option_argument_multiple_datasets
+        #for i in $option_argument_multiple_datasets_repeat:
+            #set $item = 'multiple_datasets|' + str($i.flag) + "|" + str($i.value).replace(',', str($i.delimiter)) + "|"
+            echo '$item' >> $report.files_path/options_and_arguments.txt &&
+        #end for
+
+
+        ############ option_argument_path_relative_to_a_tool
+        #for i in $option_argument_path_relative_to_a_tool_repeat:
+             #set $item = 'path_relative_to_a_tool|' + str($i.flag) + "|" + str($i.value) + "|" + str($i.a_tool_output_dir)
+             echo '$item' >> $report.files_path/options_and_arguments.txt &&
+        #end for
+
+        ############ option_argument_path_relative_to_this_tool
+        #for i in $option_argument_path_relative_to_this_tool_repeat:
+             #set $item = 'path_relative_to_this_tool|' + str($i.flag) + "|" + str($i.value) + "|" + str($i.path_type)
+             echo '$item' >> $report.files_path/options_and_arguments.txt &&
+        #end for
+
+        ############ option_argument_string_float_integer
+        #for i in $option_argument_string_float_integer_repeat:
+             #set $item = 'value|' + str($i.flag) + "|" + str($i.value) + "|"
+             echo '$item' >> $report.files_path/options_and_arguments.txt &&
+        #end for
+
+        ############ output_set
+        ## '$report'
+        ## '$report.files_path'
+        ## '$tool_help_doc'
+        ## '$tool_output_dir'
+        ## '$tool_log'
+        #######################
+        export REPORT='$report' &&
+        export REPORT_FILES_PATH='$report.files_path' &&
+        export TOOL_HELP_DOC='$tool_help_doc' &&
+        export TOOL_OUTPUT_DIR='$tool_output_dir' &&
+        export TOOL_LOG='$tool_log' &&
+
+
+        ############ run render R script to render R markdowns
+        Rscript '${__tool_directory__}/elastic_tool_render.R'
+
+        ]]></command>
+    </xml>
+
+    <!--tool citations-->
+    <xml name="citations">
+        <citation type="bibtex"><![CDATA[
+            @article{allaire2016rmarkdown,
+            title={rmarkdown: Dynamic Documents for R, 2016},
+            author={Allaire, J and Cheng, Joe and Xie, Yihui and McPherson, Jonathan and Chang, Winston and Allen, Jeff
+            and Wickham, Hadley and Atkins, Aron and Hyndman, Rob},
+            journal={R package version 0.9},
+            volume={6},
+            year={2016}
+            }
+        ]]></citation>
+        <citation type="bibtex"><![CDATA[
+            @book{xie2015elastic,
+            title={Dynamic Documents with R and knitr},
+            author={Xie, Yihui},
+            volume={29},
+            year={2015},
+            publisher={CRC Press}
+            }
+        ]]></citation>
+    </xml>
+</macros>

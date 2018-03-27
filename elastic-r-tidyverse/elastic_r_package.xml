@@ -1,0 +1,20 @@
+<tool id="tool_id" name="elastic R tidyverse" version="1.0.0">
+    <macros>
+        <import>elastic_r_package_wrappers_macros.xml</import>
+    </macros>
+    <description></description>
+    <requirements>
+        <expand macro="rmarkdown_requirements" />
+    </requirements>
+    <expand macro="stdio" />
+    <expand macro="shell_command" />
+    <inputs>
+        <expand macro="function_components" />
+    </inputs>
+    <outputs>
+        <expand macro="output_set" />
+    </outputs>
+    <citations>
+        <expand macro="citations" />
+    </citations>
+</tool>
