@@ -17,13 +17,11 @@ options_and_arguments = read.table(paste0(Sys.getenv('REPORT_FILES_PATH'), '/opt
 
 #------------------------------------------------
 # create three folders within working directory
-dir.create('list')
 dir.create('paired')
-dir.create('list_paired')
-print(Sys.getenv('JOB_WORKING_DIR'))
+
 #-----------------render Rmd--------------
 # copy R markdown file to working directory and render it within the working directory.
-render(paste0(Sys.getenv('TOOL_INSTALL_DIR'), '/elastic_tool.Rmd'), 
+render(paste0(Sys.getenv('TOOL_INSTALL_DIR'), '/paired.Rmd'),
        output_file = paste0(Sys.getenv('REPORT_FILES_PATH'), '/report.html'))
 
 # for some unknow reason, directly using REPORT as the input value for output_file parameter

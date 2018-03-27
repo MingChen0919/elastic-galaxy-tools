@@ -1,5 +1,5 @@
 ---
-title: 'Dynamic tool'
+title: 'Expose data (list)'
 output: html_document
 ---
 
@@ -29,7 +29,7 @@ df = read.table(paste0(Sys.getenv('REPORT_FILES_PATH'), '/options_and_arguments.
 knitr::kable(df)
 ```
 
-```{r}
+```{r, echo=FALSE}
 write('', file = paste0(Sys.getenv('REPORT_FILES_PATH'), '/script.sh'))
 if (nrow(df) > 0) {
   for (i in 1:nrow(df)) {

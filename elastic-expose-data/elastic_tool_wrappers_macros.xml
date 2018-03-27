@@ -20,55 +20,6 @@
   </xml>
 
   <!--shell command fragment-->
-  <xml name="shell_command">
-    <command><![CDATA[
-        echo $tool_name &&
-
-        ############ first, create a directory to store all files
-        mkdir -p $report.files_path &&
-
-
-        ############ save the tool installation directory to an environment variable
-        export TOOL_INSTALL_DIR='${__tool_directory__}' &&
-
-
-        #########################
-        ##
-        ## save user input option/argument pairs into a file
-        ##
-        #########################
-
-        ## first line will be the header
-        echo 'tool_output_dir|relative_path' > '$report.files_path/options_and_arguments.txt' &&
-
-
-
-        ####################################################
-        ## loop through repeats to get option/argument pairs
-        ####################################################
-
-
-        ############ option_argument_path_relative_to_a_tool
-        #for i in $option_argument_path_relative_to_a_tool_repeat:
-             #set $item = str($i.a_tool_output_dir) + "|" + str($i.value)
-             echo '$item' >> '$report.files_path/options_and_arguments.txt' &&
-        #end for
-
-
-        ############ output_set
-        ## '$report'
-        ## '$report.files_path'
-        #######################
-        export REPORT='$report' &&
-        export TOOL_LOG='$tool_log' &&
-        export REPORT_FILES_PATH='$report.files_path' &&
-
-
-        ############ run render R script to render R markdowns
-        Rscript '${__tool_directory__}/elastic_tool_render.R'
-
-        ]]></command>
-  </xml>
 
   <!--<xml name="output_set">-->
     <!--<data format="html" name="report" label="${tool.name} report"/>-->
