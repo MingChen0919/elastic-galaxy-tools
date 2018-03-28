@@ -9,6 +9,7 @@ sink(zz, type = 'message')
 options(stringsAsFactors = FALSE)
 
 library(rmarkdown)
+library(tidyverse)
 #------------------------------------------------
 
 #------------------------------------------------

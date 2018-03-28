@@ -25,24 +25,90 @@ str(arguments)
 
 ## 
 
-```{r}
+```{r, echo=FALSE}
+# the last row of arguments is always an operator row and is useless. 
+# let's replace it with an empty string.
+arguments[nrow(arguments), 'operator'] = ''
+
 for (i in 1:nrow(arguments)) {
-  switch (arguments[i, 'row_type'],
-    func = write(paste0(arguments[i, 'function_name'], '('), 
-                          file = paste0(Sys.getenv('REPORT_FILES_PATH'), '/job-script.R'), 
-                          append = TRUE ),
-    argument = write(paste0('  ', arguments[i, 'argument'], '=', arguments[i, 'argument']), 
-                          file = paste0(Sys.getenv('REPORT_FILES_PATH'), '/job-script.R'), 
-                          append = TRUE ),
-    operator = write(paste0('  )', arguments[i, 'operator']), 
-                          file = paste0(Sys.getenv('REPORT_FILES_PATH'), '/job-script.R'), 
+  job_script_path = paste0(Sys.getenv('REPORT_FILES_PATH'), '/job-script.R')
+  row_type = arguments[i, 'row_type']
+  if (row_type == 'func') {
+    write(paste0(arguments[i, 'function_name'], '('), 
+                          file = job_script_path, 
                           append = TRUE )
-  )
+    
+    # write function help documentation to TOOL_HELP_DOC
+    # Rd2txt(Rd_db('ggplot2')$ggplot.Rd)
+    # package_name = attr(findFunction('Rd2txt')[[1]], 'name')
+  }
+  
+  # the way we catenate the argument and argument values depends on the argument value type.
+  if (row_type == 'argument') {
+    arg_value = arguments[i, 'argument_value']
+    arg_value_type = arguments[i, 'argument_value_type']
+    if (arg_value_type == 'plain') {
+      write(paste0('  ', arguments[i, 'argument_name'], '= c(', arg_value, '),'), 
+                          file = job_script_path, 
+                          append = TRUE )
+    }
+    if (arg_value_type == 'variable') {
+      write(paste0('  ', arguments[i, 'argument_name'], '=', arg_value, ','), 
+                          file = job_script_path, 
+                          append = TRUE )
+    }
+    if (arg_value_type == 'rdata') {
+      # get the dataset number from the rdata output file
+      rdata = Sys.getenv('/export/galaxy-center/database/dataset_34.dat')
+      dataset_name = tail(strsplit(rdata, '/')[[1]], 1)
+      dataset_num = gsub(".+_([0-9]+).*$", "\\1", dataset_name)
+      
+      # all rdata output file stores one single object with the name in the format of rdata_DATASET_NUM.
+      object_id = paste0('rdata_', dataset_num)
+      write(paste0('  ', arguments[i, 'argument_name'], '=', object_id, ','), 
+                          file = job_script_path, 
+                          append = TRUE )
+    }
+    if (arg_value_type == 'formula') {
+      write(paste0('  ', arguments[i, 'argument_name'], '=', arg_value, ','), 
+                          file = job_script_path, 
+                          append = TRUE )
+    }
+  }
+  
+  # the line before each 'operator' line has the format:
+  #   'argument=argument_value,'
+  # we need to replace the ',' with ') %>%', e.g.:
+  #   'argument=argument_value) %>%'
+  if (row_type == 'operator') {
+    text_lines = readLines(con = file(job_script_path))
+    last_line = paste0(gsub(',', ')', text_lines[length(text_lines)]), 
+                       paste0('  ', arguments[i, 'operator']))
+    text_lines[length(text_lines)] = last_line
+    writeLines(text_lines, con = file(job_script_path))
+  } 
 }
-```
-
-
-```{r, echo=FALSE, eval=FALSE}
 
 ```
 
+
+```{r, results='asis'}
+readChar(job_script_path, file.info(job_script_path)$size)
+```
+
+
+```{r, 'display output directory contents', results='asis', echo=FALSE}
+## after the job is done, we list all files from the output directory.
+## full relative path to the output directory needs to be displayed.
+
+cat('##All output files')
+cat('\n\n')
+all_files = list.files(path = Sys.getenv('REPORT_FILES_PATH'), 
+                       full.names = TRUE, 
+                       recursive = TRUE)
+
+for (f in sub(Sys.getenv('REPORT_FILES_PATH'), '.', all_files) ) {
+  cat('* [', f, '](', f, ')\n')
+}
+cat('\n')
+```

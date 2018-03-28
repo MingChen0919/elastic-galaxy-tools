@@ -22,38 +22,50 @@
                 <option value="write.csv" selected="false">write.csv</option>
             </param>
             <expand macro="function_arguments" />
-            <param type="select" name="operator" label="connect to next function">
-                <sanitizer>
-                    <valid initial="string.printable"/>
-                </sanitizer>
-                <option value="%>%" selected="true">pipe (%>%)</option>
-                <option value="+" selected="false">plus (+)</option>
-            </param>
         </repeat>
     </xml>
 
     <xml name="function_arguments">
-        <repeat name="regular_argument_value" title="Argument value: from user input" min="0" default="0">
-            <param type="text" name="argument" label="argument"  />
-            <param type="text" name="argument_value"  label="argument value"  />
-            <param type="select" name="argument_value_type"  label="argument type">
-                <option value="string" selected="true">string</option>
-                <option value="numeric" selected="false">numeric</option>
-                <option value="boolean" selected="false">boolean</option>
-                <option value="variable" selected="false">variable</option>
-            </param>
+        <repeat name="function_arguments" title="argument name/value pairs" min="1" default="1">
+            <conditional name="argument_type">
+                <param name="argument_type_selector" type="select" label="Argument type">
+                    <option value="plain" selected="true">plain value</option>
+                    <option value="variable" selected="false">variable name</option>
+                    <option value="rdata" selected="false">load from RData output</option>
+                    <option value="formula" selected="false">formula</option>
+                </param>
+                <when value="plain">
+                    <param type="text" name="argument_name" label="argument name"  />
+                    <param type="text" name="argument_value"  label="argument value: plain"  />
+                </when>
+                <when value="variable">
+                    <param type="text" name="argument_name" label="argument name"  />
+                    <param type="text" name="argument_value"  label="argument value: variable name"  />
+                </when>
+                <when value="rdata">
+                    <param type="text" name="argument_name" label="argument name"  />
+                    <param type="data" format="rdata" name="argument_value" optional="false" label="RData output"  />
+                </when>
+                <when value="formula">
+                    <param type="text" name="argument_name" label="argument name"  />
+                    <param type="text" name="argument_value"  label="argument value: formula expression"  />
+                </when>
+            </conditional>
         </repeat>
-        <repeat name="rdata_argument_value" title="Argument value: from RData" min="0" default="0">
-            <param type="text" name="argument" label="argument"  />
-            <param type="data" format="rdata" name="argument_value" optional="false" label="RData output"  />
-        </repeat>
+        <param type="select" name="operator" label="connect to next function">
+            <sanitizer>
+                <valid initial="string.printable"/>
+            </sanitizer>
+            <option value="%>%" selected="true">pipe (%>%)</option>
+            <option value="+" selected="false">plus (+)</option>
+        </param>
     </xml>
 
 
     <!--output set-->
     <xml name="output_set">
         <data format="html" name="report" label="${tool.name} report"/>
-        <data format="txt" name="tool_help_doc" label="${tool.name} help doc"/>
+        <data format="rdata" name="tool_rdata_output" label="${tool.name} RData output ${on_string}"/>
         <data format="txt" name="tool_log" label="${tool.name} log" />
     </xml>
 
@@ -73,20 +85,19 @@
         ############ 3. save user inputs into arguments.txt
 
         ############    3.1 table header
-        echo 'row_type|function_name|input_type|argument|argument_value|argument_value_type|operator' > $report.files_path/arguments.txt &&
+        echo 'row_type|function_name|argument_name|argument_value|argument_value_type|operator' > $report.files_path/arguments.txt &&
 
 
         ############    3.2 loop through function component repeat
-        #for $fun_component in $function_components:
-            echo 'func|$fun_component.function_name|||||' >> $report.files_path/arguments.txt &&
-            #for reg_arg in $fun_component.regular_argument_value
-                echo 'argument||regular|$reg_arg.argument|$reg_arg.argument_value|$reg_arg.argument_value_type|' >> $report.files_path/arguments.txt &&
-            #end for
+        #for fun_component in $function_components:
+            echo 'func|$fun_component.function_name||||' >> $report.files_path/arguments.txt &&
 
-            #for rdata_arg in $fun_component.rdata_argument_value
-                echo 'argument||rdata|$rdata_arg.argument|$rdata_arg.argument_value|rdata|' >> $report.files_path/arguments.txt &&
+            Rscript -e 'library(tidyverse); help($fun_component.function_name)' >> $report.files_path/$fun_component.function_name-help.txt &&
+
+            #for argument in $fun_component.function_arguments:
+                echo 'argument||$argument.argument_type.argument_name|$argument.argument_type.argument_value|$argument.argument_type.argument_type_selector|' >> $report.files_path/arguments.txt &&
             #end for
-            echo 'operator||||||$fun_component.operator' >> $report.files_path/arguments.txt &&
+            echo 'operator|||||$fun_component.operator' >> $report.files_path/arguments.txt &&
         #end for
 
         ############ output_set
@@ -97,7 +108,7 @@
         #######################
         export REPORT='$report' &&
         export REPORT_FILES_PATH='$report.files_path' &&
-        export TOOL_HELP_DOC='$tool_help_doc' &&
+        export TOOL_RDATA_OUTPUT='$tool_rdata_output' &&
         export TOOL_LOG='$tool_log' &&
 
 
