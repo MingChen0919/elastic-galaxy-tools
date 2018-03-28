@@ -19,5 +19,30 @@ knitr::opts_chunk$set(error = TRUE)
 ## User input
 
 ```{r}
-arguments
+knitr::kable(arguments)
+str(arguments)
 ```
+
+## 
+
+```{r}
+for (i in 1:nrow(arguments)) {
+  switch (arguments[i, 'row_type'],
+    func = write(paste0(arguments[i, 'function_name'], '('), 
+                          file = paste0(Sys.getenv('REPORT_FILES_PATH'), '/job-script.R'), 
+                          append = TRUE ),
+    argument = write(paste0('  ', arguments[i, 'argument'], '=', arguments[i, 'argument']), 
+                          file = paste0(Sys.getenv('REPORT_FILES_PATH'), '/job-script.R'), 
+                          append = TRUE ),
+    operator = write(paste0('  )', arguments[i, 'operator']), 
+                          file = paste0(Sys.getenv('REPORT_FILES_PATH'), '/job-script.R'), 
+                          append = TRUE )
+  )
+}
+```
+
+
+```{r, echo=FALSE, eval=FALSE}
+
+```
+

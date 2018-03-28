@@ -73,18 +73,20 @@
         ############ 3. save user inputs into arguments.txt
 
         ############    3.1 table header
-        echo 'function|input_type|argument|argument_value|argument_value_type|operator' > $report.files_path/arguments.txt &&
+        echo 'row_type|function_name|input_type|argument|argument_value|argument_value_type|operator' > $report.files_path/arguments.txt &&
 
 
         ############    3.2 loop through function component repeat
         #for $fun_component in $function_components:
+            echo 'func|$fun_component.function_name|||||' >> $report.files_path/arguments.txt &&
             #for reg_arg in $fun_component.regular_argument_value
-                echo '$fun_component.function_name|regular|$reg_arg.argument|$reg_arg.argument_value|$reg_arg.argument_value_type|$fun_component.operator' >> $report.files_path/arguments.txt &&
+                echo 'argument||regular|$reg_arg.argument|$reg_arg.argument_value|$reg_arg.argument_value_type|' >> $report.files_path/arguments.txt &&
             #end for
 
             #for rdata_arg in $fun_component.rdata_argument_value
-                echo '$fun_component.function_name|rdata|$rdata_arg.argument|$rdata_arg.argument_value|rdata|$fun_component.operator' >> $report.files_path/arguments.txt &&
+                echo 'argument||rdata|$rdata_arg.argument|$rdata_arg.argument_value|rdata|' >> $report.files_path/arguments.txt &&
             #end for
+            echo 'operator||||||$fun_component.operator' >> $report.files_path/arguments.txt &&
         #end for
 
         ############ output_set
