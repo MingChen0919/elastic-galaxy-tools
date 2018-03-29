@@ -17,6 +17,7 @@
         <repeat name="function_components" title="Call a function" min="1" default="1">
             <param type="select" name="function_name" multiple="false" label="==== Call function ====">
                 <option value="ggplot" selected="false">ggplot</option>
+                <option value="geom_point" selected="false">geom_point</option>
                 <option value="aes" selected="false">ggplot</option>
                 <option value="read.table" selected="false">read.table</option>
                 <option value="write.csv" selected="false">write.csv</option>
@@ -26,29 +27,19 @@
     </xml>
 
     <xml name="function_arguments">
-        <repeat name="function_arguments" title="argument name/value pairs" min="1" default="1">
+        <repeat name="function_arguments" title="argument name/value pairs" min="0" default="0">
             <conditional name="argument_type">
                 <param name="argument_type_selector" type="select" label="Argument type">
-                    <option value="plain" selected="true">plain value</option>
-                    <option value="variable" selected="false">variable name</option>
-                    <option value="rdata" selected="false">load from RData output</option>
-                    <option value="formula" selected="false">formula</option>
+                    <option value="value" selected="false">user input value</option>
+                    <option value="rdata" selected="false">value from RData output</option>
                 </param>
-                <when value="plain">
+                <when value="value">
                     <param type="text" name="argument_name" label="argument name"  />
-                    <param type="text" name="argument_value"  label="argument value: plain"  />
-                </when>
-                <when value="variable">
-                    <param type="text" name="argument_name" label="argument name"  />
-                    <param type="text" name="argument_value"  label="argument value: variable name"  />
+                    <param type="text" name="argument_value"  label="argument value"  />
                 </when>
                 <when value="rdata">
                     <param type="text" name="argument_name" label="argument name"  />
                     <param type="data" format="rdata" name="argument_value" optional="false" label="RData output"  />
-                </when>
-                <when value="formula">
-                    <param type="text" name="argument_name" label="argument name"  />
-                    <param type="text" name="argument_value"  label="argument value: formula expression"  />
                 </when>
             </conditional>
         </repeat>
