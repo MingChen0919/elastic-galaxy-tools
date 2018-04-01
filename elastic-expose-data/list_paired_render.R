@@ -9,6 +9,7 @@ sink(zz, type = 'message')
 options(stringsAsFactors = FALSE)
 
 library(rmarkdown)
+library(stringr)
 #------------------------------------------------
 
 #------------------------------------------------
@@ -30,6 +31,11 @@ render(paste0(Sys.getenv('TOOL_INSTALL_DIR'), '/list_paired.Rmd'),
 # file to ${REPORT}
 system(command = 'cp ${REPORT_FILES_PATH}/report.html ${REPORT}')
 system(command = 'sh ${REPORT_FILES_PATH}/script.sh')
+
+# rename files so that all files have the name pattern BASENAME_forward.EXT and BASENAME_reverse.EXT
+from_files = list.files('list_paired', full.names = TRUE)
+to_files = str_replace_all(from_files, c('_1', '_2'), c('_forward', '_reverse'))
+file.rename(from = from_files, to = to_files)
 #------------------------------------------
 
 
