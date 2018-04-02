@@ -19,8 +19,8 @@ options_and_arguments = read.table(paste0(Sys.getenv('REPORT_FILES_PATH'), '/opt
 # create three folders within working directory
 dir.create('list')
 
-job_working_dir = getwd()
-list_path = paste0(job_working_dir, '/list/')
+# job_working_dir = getwd()
+# list_path = paste0(job_working_dir, '/list/')
 
 #-----------------render Rmd--------------
 # copy R markdown file to working directory and render it within the working directory.
@@ -32,7 +32,7 @@ render(paste0(Sys.getenv('TOOL_INSTALL_DIR'), '/list.Rmd'),
 # the solution is to render the rmarkdown to a explicitly specified file and then copy the
 # file to ${REPORT}
 system(command = 'cp ${REPORT_FILES_PATH}/report.html ${REPORT}')
-# system(command = 'sh ${REPORT_FILES_PATH}/script.sh')
+system(command = 'sh ${REPORT_FILES_PATH}/script.sh')
 #------------------------------------------
 
 

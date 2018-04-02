@@ -30,25 +30,18 @@ knitr::kable(df)
 ```
 
 ```{r, echo=FALSE}
-# write('', file = paste0(Sys.getenv('REPORT_FILES_PATH'), '/script.sh'))
+write('', file = paste0(Sys.getenv('REPORT_FILES_PATH'), '/script.sh'))
 if (nrow(df) > 0) {
   for (i in 1:nrow(df)) {
     tool_output_dir = readLines(df[i, 'tool_output_dir'])[1]
     full_path = paste0(tool_output_dir, '/', df[i, 'relative_path'])
+    # if it is a directory path, add '/*' to the end.
     if (dir.exists(full_path)) {
-      from_files = list.files(full_path, full.names = TRUE)
-      to_files = list.files(full_path)
-      to_files = paste0(list_path, to_files)
-      file.copy(from = from_files, to = to_files)
+      full_path = paste0(full_path, '/*')
     }
-    if (file.exists(full_path)) {
-      # to_files = list.files(full_path)
-      to_file = tail(strsplit(full_path, '/')[[1]], 1)
-      file.copy(from = full_path, to = paste0(list_path, to_file))
-    }
-    # command_line = paste0('cp -r ', full_path, ' paired')
-    # write(command_line, append = TRUE, 
-    #       file = paste0(Sys.getenv('REPORT_FILES_PATH'), '/script.sh'))
+    command_line = paste0('cp -r ', full_path, ' list')
+    write(command_line, append = TRUE, 
+          file = paste0(Sys.getenv('REPORT_FILES_PATH'), '/script.sh'))
   }
 }
 ```
