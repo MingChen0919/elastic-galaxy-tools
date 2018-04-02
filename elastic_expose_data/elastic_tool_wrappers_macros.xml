@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<macros>
+  <xml name="rmarkdown_requirements">
+    <requirement type="package" version="1.15.0.6-0">pandoc</requirement>
+    <requirement type="package" version="1.6">r-rmarkdown</requirement>
+  </xml>
+  <xml name="stdio">
+    <stdio>
+      <regex match="XXX" source="stderr" level="warning" description="Check the tool log output file for more details."/>
+    </stdio>
+  </xml>
+  <!--OPTION/ARGUMENT PAIRS and INPUT types-->
+
+  <!--input path-->
+  <xml name="option_argument_path_relative_to_a_tool">
+    <repeat name="option_argument_path_relative_to_a_tool_repeat" title="INPUT DATA PATH: relative to a tool output directory" min="0" default="0">
+      <param name="a_tool_output_dir" type="data" optional="false" multiple="false" label="a tool output directory"/>
+      <param type="text" name="value" optional="true" label="relative path"/>
+    </repeat>
+  </xml>
+
+  <!--shell command fragment-->
+
+  <!--<xml name="output_set">-->
+    <!--<data format="html" name="report" label="${tool.name} report"/>-->
+    <!--<data format="txt" name="tool_log" label="${tool.name} log"/>-->
+    <!--<collection type="list" name="list_collection">-->
+      <!--<discover_datasets pattern="__name_and_ext__" directory="list" />-->
+    <!--</collection>-->
+    <!--<collection type="paired" name="list_collection">-->
+      <!--<discover_datasets pattern="__name_and_ext__" directory="paired_dir" />-->
+    <!--</collection>-->
+    <!--<collection type="list:paired" name="list_collection">-->
+      <!--<discover_datasets pattern="(?P&lt;identifier_0&gt;[^_]+)_(?P&lt;identifier_1&gt;[^_]+)\.(?P&lt;ext&gt;[^\._]+)?"-->
+                         <!--directory="list_paired"/>-->
+    <!--</collection>-->
+  <!--</xml>-->
+
+  <!--tool citations-->
+  <xml name="citations">
+    <citation type="bibtex"><![CDATA[
+            @article{allaire2016rmarkdown,
+            title={rmarkdown: Dynamic Documents for R, 2016},
+            author={Allaire, J and Cheng, Joe and Xie, Yihui and McPherson, Jonathan and Chang, Winston and Allen, Jeff
+            and Wickham, Hadley and Atkins, Aron and Hyndman, Rob},
+            journal={R package version 0.9},
+            volume={6},
+            year={2016}
+            }
+        ]]></citation>
+    <citation type="bibtex"><![CDATA[
+            @book{xie2015elastic,
+            title={Dynamic Documents with R and knitr},
+            author={Xie, Yihui},
+            volume={29},
+            year={2015},
+            publisher={CRC Press}
+            }
+        ]]></citation>
+  </xml>
+</macros>
