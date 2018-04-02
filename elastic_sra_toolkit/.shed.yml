@@ -1,0 +1,11 @@
+---
+name: elastic_sra_toolkit
+owner: mingchen0919
+description: a collection of tools and libraries for using data in the INSDC Sequence
+  Read Archives.
+long_description: ""
+remote_repository_url: ""
+type: unrestricted
+categories:
+  Sequence Analysis: Sequence Analysis
+...

@@ -1,0 +1,82 @@
+<macros>
+
+    <!--change tool_id and elastic tool in the first line of elastic_tool.xml with appropriate tool_id and tool_name.-->
+
+    <!--add tool requirements-->
+    <xml name="tool_requirements">
+        <requirement type="package" version="1.15.0.6-0">pandoc</requirement>
+        <requirement type="package" version="1.6">r-rmarkdown</requirement>
+        <requirement type="package" version="2.8.2">sra-tools</requirement>
+    </xml>
+
+    <!--add tool description-->
+    <xml name="tool_description">
+        <description>a collection of tools and libraries for using data in the INSDC Sequence Read Archives.</description>
+    </xml>
+
+    <!--add tool options-->
+    <xml name="tool_options">
+        <option value="fastq-dump" selected="true">fastq-dump</option>
+        <option value="prefetch" selected="false">prefetch</option>
+        <option value="sam-dump" selected="false">sam-dump</option>
+        <option value="sra-pileup" selected="false">sra-pileup</option>
+        <option value="vdb-config" selected="false">vdb-config</option>
+        <option value="vdb-decrypt" selected="false">vdb-decrypt</option>
+        <option value="abi-dump" selected="false">abi-dump</option>
+        <option value="illumina-dump" selected="false">illumina-dump</option>
+        <option value="sff-dump" selected="false">sff-dump</option>
+        <option value="sra-stat" selected="false">sra-stat</option>
+        <option value="vdb-dump" selected="false">vdb-dump</option>
+        <option value="vdb-encrypt" selected="false">vdb-encrypt</option>
+        <option value="vdb-validate" selected="false">vdb-validate</option>
+    </xml>
+
+    <!--add tool help-->
+    <xml name="tool_help">
+        <help><![CDATA[
+            SRA Toolkit Documentation: http://ncbi.github.io/sra-tools/
+            
+            Example 1: download paired end reads and split them into forward and reverse reads.
+              + Tool name: fastq-dump
+              + 1: PATH: relative to this tool output directory
+                  * option: -O
+                  * value: SRA
+                  * path type: directory path
+              + 1: INPUT VALUE: string/float/integer
+                  * option: --split-files
+                  * value: SRR6077558 ERR343809
+                  
+            Example 2: download single end reads
+              + Tool name: fastq-dump
+              + 1: PATH: relative to this tool output directory
+                  * option: -O
+                  * value: SRA
+                  * path type: directory path
+              + 1: INPUT VALUE: string/float/integer
+                  * value: SRR6077558 ERR343809
+        ]]></help>
+    </xml>
+
+    <!--add tool citations-->
+    <xml name="citations">
+        <citation type="bibtex"><![CDATA[
+            @article{allaire2016rmarkdown,
+            title={rmarkdown: Dynamic Documents for R, 2016},
+            author={Allaire, J and Cheng, Joe and Xie, Yihui and McPherson, Jonathan and Chang, Winston and Allen, Jeff
+            and Wickham, Hadley and Atkins, Aron and Hyndman, Rob},
+            journal={R package version 0.9},
+            volume={6},
+            year={2016}
+            }
+        ]]></citation>
+        <citation type="bibtex"><![CDATA[
+            @book{xie2015elastic,
+            title={Dynamic Documents with R and knitr},
+            author={Xie, Yihui},
+            volume={29},
+            year={2015},
+            publisher={CRC Press}
+            }
+        ]]></citation>
+    </xml>
+</macros>

@@ -1,0 +1,147 @@
+---
+title: 'Tool Report'
+output: html_document
+---
+
+<style>
+pre code, pre, code {
+  white-space: pre !important;
+  overflow-x: scroll !important;
+  word-break: keep-all !important;
+  word-wrap: initial !important;
+}
+</style>
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(error = TRUE)
+```
+
+## User input
+
+```{r, 'display user input', echo=FALSE}
+# get user input and save it into a data frame.
+df = read.table(paste0(Sys.getenv('REPORT_FILES_PATH'), '/options_and_arguments.txt'), 
+                sep = '|', header = TRUE)
+
+# if the input type is 'path_relative_to_a_tool', prepend A_TOOL_OUTPUT_PATH to the value to make
+# the value a full path.
+if (nrow(df[df$type == 'path_relative_to_a_tool', ]) > 0) {
+  for (i in 1:nrow(df[df$type == 'path_relative_to_a_tool', ])) {
+    root_path = readLines(df[df$type == 'path_relative_to_a_tool', ][i, 'path_type'])[1]
+    df[df$type == 'path_relative_to_a_tool', ][i, 'value'] = paste(root_path, 
+                                                                   df[df$type == 'path_relative_to_a_tool', ][i, 'value'], 
+                                                                   sep = '/')
+  }
+}
+
+## display user input as a table
+knitr::kable(df)
+```
+
+
+```{r, 'build script', echo=FALSE}
+##-------- build script files -----------
+
+# get tool name, the first line of the script is always the tool name.
+tool_name = df[df$type == 'tool_name', 'value']
+
+# if the number of option/argument pairs is larger than 0, build script file
+df2 = df[df$type != 'tool_name', ]
+if (nrow(df2) > 0) {
+  # write tool name as the first line of the script.sh
+  # before running the job, cd into the ${REPORT_FILES_PATH} directory
+  write(paste0(tool_name, ' \\'), 
+        paste0(Sys.getenv('REPORT_FILES_PATH'), '/script.sh'))
+  df2 = df[df$type != 'tool_name', ]
+  write(paste(' ', df2$option, df2$value, '\\', sep = ' '),
+        file = paste0(Sys.getenv('REPORT_FILES_PATH'), '/script.sh'), 
+        append = TRUE )
+  # remember that after writing option/argument lines to the script.sh, the last line
+  # has an extra newline character '\' which causes a problem. We can either remove that extra
+  # '\' or add a new line to the end. We choose to add a new line.
+  
+  # add an extra line to the end to redirect stdout to stdout.txt and stderr to stderr.txt
+  write('  > ${REPORT_FILES_PATH}/stdout.txt 2>${REPORT_FILES_PATH}/stderr.txt', 
+        paste0(Sys.getenv('REPORT_FILES_PATH'), '/script.sh'), append = TRUE)
+} else {
+  # if no option/argument input, simply display the help message
+  write(paste0(tool_name, ' -h'), 
+        file = paste0(Sys.getenv('REPORT_FILES_PATH'), '/script.sh'))
+}
+```
+
+
+```{r, 'create paths if they do not exist', echo=FALSE}
+## if the input type is 'path_relative_to_this_tool', that means 
+## we need to create a directory or file path.
+
+# create paths before running the job script
+df_paths = df[df$type == 'path_relative_to_this_tool', ]
+
+if (nrow(df_paths) > 0) {
+  for (i in 1:nrow(df_paths)) {
+    path = paste0(Sys.getenv('REPORT_FILES_PATH'), '/', df_paths[i, 'value'])
+    path_type = df_paths[i, 'path_type']
+  
+    # create file paths
+    if ((path_type == 'file_path') & !file.exists(path)) {
+      dir_path = paste(head(strsplit(path, '/')[[1]], -1), collapse = '/' )
+      if (!dir.exists(dir_path)) {
+        dir.create(dir_path, recursive = TRUE)
+      }
+      file.create(path)
+    }
+    
+    # create dir paths
+    if ((path_type == 'dir_path') & !dir.exists(path)) {
+      dir.create(path, recursive = TRUE)
+    }
+  }
+}
+```
+
+
+```{bash, 'run jobs', echo=FALSE}
+# run job script, always use absolute path. 
+# we want to run all jobs within the working path.
+sh ${REPORT_FILES_PATH}/script.sh
+```
+
+
+```{bash, 'display script', results='asis', echo=FALSE}
+echo '## Job script'
+echo ''
+echo ''
+echo '```bash'
+cat ${REPORT_FILES_PATH}/script.sh
+echo '```'
+```
+
+
+```{r, 'display output directory contents', results='asis', echo=FALSE}
+## after the job is done, we list all files from the output directory.
+## full relative path to the output directory needs to be displayed.
+
+cat('##All output files')
+cat('\n\n')
+all_files = list.files(path = Sys.getenv('REPORT_FILES_PATH'), 
+                       full.names = TRUE, 
+                       recursive = TRUE)
+
+for (f in sub(Sys.getenv('REPORT_FILES_PATH'), '.', all_files) ) {
+  cat('* [', f, '](', f, ')\n')
+}
+cat('\n')
+```
+
+
+```{r, 'save output directory of this tool', echo=FALSE}
+## each elastic tool has a galaxy history output which contains the REPORT_FILES_PATH of this tool
+## so that other tools can reference the outputs from this tool.
+
+## obtain REPORT_FILES_PAHT and save it to a galaxy output.
+database_root = paste(head(strsplit(Sys.getenv('TOOL_LOG'), '/')[[1]], -1), collapse = '/')
+tool_output_dir_id = tail(strsplit(Sys.getenv('REPORT_FILES_PATH'), '/')[[1]], 1)
+tool_output_dir = paste0(database_root, '/', tool_output_dir_id)
+write(tool_output_dir, Sys.getenv('TOOL_OUTPUT_DIR'))
+```

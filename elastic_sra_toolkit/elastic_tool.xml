@@ -1,0 +1,136 @@
+<tool id="elastic_sra_toolkit" name="elastic sra-toolkit" version="1.0.0">
+    <macros>
+        <import>elastic_tool_macros.xml</import>
+    </macros>
+    <expand macro="tool_description"/>
+    <requirements>
+        <expand macro="tool_requirements"/>
+    </requirements>
+    <stdio>
+        <regex match="XXX" source="stderr" level="warning"
+               description="Check the tool log output file for more details."/>
+    </stdio>
+    <command><![CDATA[
+
+        ############ first, create a directory to store all files
+        mkdir -p $report.files_path &&
+
+
+        ############ save the tool installation directory to an environment variable
+        export TOOL_INSTALL_DIR='${__tool_directory__}' &&
+
+
+        #########################
+        ##
+        ## save user input option/argument pairs into a file
+        ##
+        #########################
+
+        ## first line will be the header
+        echo 'type|option|value|path_type' > $report.files_path/options_and_arguments.txt &&
+
+        ############ tool_name
+        ##-t '$tool_name'
+        echo "tool_name|not available|${tool_name}|not available" >> $report.files_path/options_and_arguments.txt &&
+
+        ####################################################
+        ## loop through repeats to get option/argument pairs
+        ####################################################
+
+        ############ option_argument_single_dataset
+        #for i in $option_argument_single_dataset_repeat:
+            #set $item = 'single_dataset|' + str($i.option) + "|" + str($i.value) + "|"
+            echo '$item' >> $report.files_path/options_and_arguments.txt &&
+        #end for
+
+        ############ option_argument_multiple_datasets
+        #for i in $option_argument_multiple_datasets_repeat:
+            #set $item = 'multiple_datasets|' + str($i.option) + "|" + str($i.value).replace(',', str($i.delimiter)) + "|"
+            echo '$item' >> $report.files_path/options_and_arguments.txt &&
+        #end for
+
+
+        ############ option_argument_path_relative_to_other_tool
+        #for i in $option_argument_path_relative_to_other_tool_repeat:
+             #set $item = 'path_relative_to_a_tool|' + str($i.option) + "|" + str($i.value) + "|" + str($i.a_tool_output_dir)
+             echo '$item' >> $report.files_path/options_and_arguments.txt &&
+        #end for
+
+        ############ option_argument_path_relative_to_this_tool
+        #for i in $option_argument_path_relative_to_this_tool_repeat:
+             #set $item = 'path_relative_to_this_tool|' + str($i.option) + "|" + $report.files_path + '/' + str($i.value) + "|" + str($i.path_type)
+             echo '$item' >> $report.files_path/options_and_arguments.txt &&
+        #end for
+
+        ############ option_argument_string_float_integer
+        #for i in $option_argument_string_float_integer_repeat:
+             #set $item = 'value|' + str($i.option) + "|" + str($i.value) + "|"
+             echo '$item' >> $report.files_path/options_and_arguments.txt &&
+        #end for
+
+        ############ output_set
+        ## '$report'
+        ## '$report.files_path'
+        ## '$tool_output_dir'
+        ## '$tool_log'
+        #######################
+        export REPORT='$report' &&
+        export REPORT_FILES_PATH='$report.files_path' &&
+        export TOOL_OUTPUT_DIR='$tool_output_dir' &&
+        export TOOL_LOG='$tool_log' &&
+
+
+        ############ run render R script to render R markdowns
+        Rscript '${__tool_directory__}/elastic_tool_render.R'
+
+        ]]></command>
+    <inputs>
+        <param type="select" name="tool_name" multiple="false" label="Tool name">
+            <expand macro="tool_options"/>
+        </param>
+        <repeat name="option_argument_single_dataset_repeat" title="DATA FROM HISTORY: single data set" min="0"
+                default="0">
+            <param type="text" name="option" optional="true" label="option"/>
+            <param name="value" type="data" optional="false" multiple="false" label="value"/>
+        </repeat>
+        <repeat name="option_argument_multiple_datasets_repeat" title="DATA FROM HISTORY: multiple data sets"
+                min="0" default="0">
+            <param type="text" name="option" optional="true" label="option"/>
+            <param name="value" type="data" optional="false" multiple="true" label="value"/>
+            <param type="select" name="delimiter" multiple="false" label="file delimiter">
+                <option value=" " selected="false">space</option>
+                <option value="," selected="false">comma</option>
+            </param>
+        </repeat>
+        <repeat name="option_argument_path_relative_to_other_tool_repeat"
+                title="PATH: relative to other tool output directory" min="0" default="0">
+            <param type="text" name="option" optional="true" label="option"/>
+            <param name="a_tool_output_dir" type="data" optional="false" multiple="false"
+                   label="a tool output directory"/>
+            <param type="text" name="value" optional="true" label="value"/>
+        </repeat>
+        <repeat name="option_argument_path_relative_to_this_tool_repeat"
+                title="PATH: relative to this tool output directory" min="0" default="0">
+            <param type="text" name="option" optional="true" label="option"/>
+            <param type="text" name="value" optional="false" label="value"/>
+            <param type="select" name="path_type" multiple="false" label="path type">
+                <option value="file_path" selected="false">file path</option>
+                <option value="dir_path" selected="false">directory path</option>
+            </param>
+        </repeat>
+        <repeat name="option_argument_string_float_integer_repeat" title="INPUT VALUE: string/float/integer" min="0"
+                default="0">
+            <param type="text" name="option" label="option"/>
+            <param type="text" name="value" label="value"/>
+        </repeat>
+    </inputs>
+    <outputs>
+        <data format="html" name="report" label="${tool.name} report ${on_string}"/>
+        <data format="txt" name="tool_output_dir" label="${tool.name} output directory ${on_string}"/>
+        <data format="txt" name="tool_log" label="${tool.name} log ${on_string}"/>
+    </outputs>
+    <expand macro="tool_help" />
+    <citations>
+        <expand macro="citations"/>
+    </citations>
+</tool>
